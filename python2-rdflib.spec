@@ -2,13 +2,16 @@
 
 %global run_tests 0
 
+%{?python_enable_dependency_generator}
+
+
 %global commit0 e00480271a6de85ea3e24b63c177b34340a5c2dd
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gver .git%{shortcommit0}
 
 Name:           python2-%{pypi_name}
 Version:        4.2.2
-Release:        1%{?dist}
+Release:        7%{?dist}
 Summary:        Python2 library for working with RDF
 
 License:        BSD
@@ -17,23 +20,13 @@ Source0:	https://github.com/RDFLib/rdflib/archive/%{commit0}.tar.gz#/%{name}-%{s
 BuildArch:      noarch
 
 BuildRequires:  python2-pip
-#BuildRequires:  python2-html5lib 
-#BuildRequires:  python2-isodate
-#BuildRequires:  python2-pyparsing
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
+BuildRequires:	python2-six
 
-%{?python_provide:%python_provide python2-%{pypi_name}}
-#Requires:       python2-html5lib >= 1:
-#Requires:       python2-isodate
-#Requires:       python2-pyparsing
-Obsoletes:      python-rdfextras <= 0.1-7
-Provides:       python-rdfextras = %{version}-%{release}
-
-Provides:      bundled(python2-html5lib) = 1.0.1
-Provides:      bundled(python2-isodate) = 0.6.0
-Provides:      bundled(python2-pyparsing) = 2.4.5
-Provides:      bundled(python2-six) = 1.13.0
+Requires:       python2-html5lib 
+Requires:       python2-isodate
+Requires:       python2-pyparsing
 
 %if %{run_tests}
 BuildRequires:  python2-nose >= 0.9.2
@@ -51,6 +44,67 @@ implementations for in memory storage, persistent storage on top
 of the Berkeley DB, and a wrapper for remote SPARQL endpoints.
 
 This is for Python 2.
+
+#----------
+
+%package -n     python2-html5lib
+Version:	1.0.1
+Summary:        A python based HTML parser/tokenizer
+Url:		https://github.com/html5lib/html5lib-python
+
+%description -n python2-html5lib
+A python2 based HTML parser/tokenizer based on the WHATWG HTML5 
+specification for maximum compatibility with major desktop web browsers.
+
+#----------
+
+%package -n     python2-isodate
+Version:	0.6.0
+Summary:        An ISO 8601 date/time/duration parser and formatter
+Url:		https://pypi.org/project/isodate/
+Provides:	python2.7dist(isodate)
+
+%description -n python2-isodate
+This module implements ISO 8601 date, time and duration 
+parsing. The implementation follows ISO8601:2004 standard, and implements only 
+date/time\ representations mentioned in the standard. If something is not 
+mentioned there, then it is treated as non existent, and not as an allowed 
+option.
+
+For instance, ISO8601:2004 never mentions 2 digit years. So, it is not intended\
+by this module to support 2 digit years. (while it may still be valid as ISO\
+date, because it is not explicitly forbidden.) Another example is, when no time\
+zone information is given for a time, then it should be interpreted as local\
+time, and not UTC.
+
+As this module maps ISO 8601 dates/times to standard Python data types, like\
+date, time, datetime and timedelta, it is not possible to convert all possible\
+ISO 8601 dates/times. For instance, dates before 0001-01-01 are not allowed by\
+the Python date and datetime classes. Additionally fractional seconds are\
+limited to microseconds. That means if the parser finds for instance\
+nanoseconds it will round it to microseconds.
+
+#----------
+
+%package -n     python2-pyparsing
+Version:	2.4.5
+Summary:        Python package with an object-oriented approach to text processing
+Url:		https://github.com/pyparsing/pyparsing/
+Provides:	python2.7dist(pyparsing)
+
+%description -n python2-pyparsing
+pyparsing is a module that can be used to easily and directly configure syntax
+definitions for any number of text parsing applications.
+
+#----------
+
+%package -n     python2-webencodings
+Version:	0.5.1
+Summary:        Character encoding for the web
+Url:		https://github.com/gsnedders/python-webencodings
+
+%description -n python2-webencodings
+his is a Python implementation of the WHATWG Encoding standard. 
 
 
 %prep
@@ -137,7 +191,7 @@ PYTHONPATH=./build/lib %{__python2} run_tests.py --verbose || :
 %exclude %{_bindir}/rdfpipe
 %exclude %{_bindir}/rdfs2dot
 
-
+%files -n python2-html5lib
 %{python2_sitelib}/html5lib-1.0.1.dist-info/DESCRIPTION.rst
 %{python2_sitelib}/html5lib-1.0.1.dist-info/INSTALLER
 %{python2_sitelib}/html5lib-1.0.1.dist-info/LICENSE.txt
@@ -249,6 +303,7 @@ PYTHONPATH=./build/lib %{__python2} run_tests.py --verbose || :
 %{python2_sitelib}/html5lib/treewalkers/genshi.pyc
 %{python2_sitelib}/html5lib/treewalkers/genshi.pyo
 
+%files -n python2-isodate
 %{python2_sitelib}/isodate-0.6.0.dist-info/DESCRIPTION.rst
 %{python2_sitelib}/isodate-0.6.0.dist-info/INSTALLER
 %{python2_sitelib}/isodate-0.6.0.dist-info/METADATA
@@ -308,6 +363,7 @@ PYTHONPATH=./build/lib %{__python2} run_tests.py --verbose || :
 %{python2_sitelib}/isodate/tzinfo.pyc
 %{python2_sitelib}/isodate/tzinfo.pyo
 
+%files -n python2-pyparsing
 %{python2_sitelib}/pyparsing-2.4.5.dist-info/DESCRIPTION.rst
 %{python2_sitelib}/pyparsing-2.4.5.dist-info/INSTALLER
 %{python2_sitelib}/pyparsing-2.4.5.dist-info/LICENSE.txt
@@ -320,17 +376,7 @@ PYTHONPATH=./build/lib %{__python2} run_tests.py --verbose || :
 %{python2_sitelib}/pyparsing.pyc
 %{python2_sitelib}/pyparsing.pyo
 
-%{python2_sitelib}/six-1.13.0.dist-info/INSTALLER
-%{python2_sitelib}/six-1.13.0.dist-info/LICENSE
-%{python2_sitelib}/six-1.13.0.dist-info/METADATA
-%{python2_sitelib}/six-1.13.0.dist-info/RECORD
-%{python2_sitelib}/six-1.13.0.dist-info/WHEEL
-%{python2_sitelib}/six-1.13.0.dist-info/top_level.txt
-%{python2_sitelib}/six.py
-%{python2_sitelib}/six.pyc
-%{python2_sitelib}/six.pyo
-
-
+%files -n python2-webencodings
 %{python2_sitelib}/webencodings-0.5.1.dist-info/DESCRIPTION.rst
 %{python2_sitelib}/webencodings-0.5.1.dist-info/INSTALLER
 %{python2_sitelib}/webencodings-0.5.1.dist-info/METADATA
@@ -357,6 +403,9 @@ PYTHONPATH=./build/lib %{__python2} run_tests.py --verbose || :
 
 
 %changelog
+
+* Wed Dec 18 2019 David Va <davidva AT tuta DOT io> - 4.2.2-7
+- Sub-packages enabled
 
 * Tue Dec 10 2019 David Va <davidva AT tuta DOT io> - 4.2.2-1
 - Updated to current commit
